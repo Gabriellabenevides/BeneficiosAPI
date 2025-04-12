@@ -1,5 +1,9 @@
+using Beneficios.Application;
+using Beneficios.Application.Handlers;
 using Beneficios_API.Extensions.SwaggerConfigurations;
-using Beneficios.MongoDB.Repositories;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace Beneficios_API;
 
@@ -19,11 +23,15 @@ public static class Program
 
         // Configuração de serviços
         builder.Services
-            .AddSwaggerConfig(builder.Configuration)
+            .AddSwaggerConfig(builder.Configuration) 
+            .AddApplication(builder.Configuration)   
             .AddControllers();
 
         // Adiciona a configuração do MongoDB e repositórios
-        builder.Services.AddRespository(builder.Configuration);
+        builder.Services.AddRepository(builder.Configuration);
+
+        // With this line:
+        builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(IncluirBeneficioColaboradorHandler).Assembly));
 
         var app = builder.Build();
 

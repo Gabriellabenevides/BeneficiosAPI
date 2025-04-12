@@ -1,13 +1,9 @@
 ﻿using Beneficios.Domain.Repositories;
+using Beneficios.MongoDB.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 
-namespace Beneficios.MongoDB.Repositories;
-
-/// <summary>
-/// Classe responsável por configurar a injeção de dependência para os repositórios.
-/// </summary>
 public static class AddRepositorySetup
 {
     /// <summary>
@@ -16,7 +12,7 @@ public static class AddRepositorySetup
     /// <param name="services">O contêiner de serviços.</param>
     /// <param name="configuration">As configurações da aplicação.</param>
     /// <returns>O contêiner de serviços atualizado.</returns>
-    public static IServiceCollection AddRespository(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddRepository(this IServiceCollection services, IConfiguration configuration)
     {
         // Configura a conexão com o MongoDB
         var mongoConnectionString = configuration.GetConnectionString("MongoDb") ?? "mongodb://localhost:27017";
@@ -27,10 +23,12 @@ public static class AddRepositorySetup
         // Registra o banco de dados no contêiner de serviços
         services.AddSingleton(database);
 
-        // Registra os repositórios genéricos
+        // Registra os repositórios genéricos como tipos abertos
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+        // Registra o repositório específico para IBeneficioColaboradorRepository
+        services.AddScoped<IBeneficioColaboradorRepository, BeneficiosColaraboradorRepository>();
 
         return services;
     }
 }
-
