@@ -1,7 +1,4 @@
-﻿using Beneficios.Application.Handlers;
-using Beneficios.Domain.Entities.Commands;
-using Beneficios.Domain.Entities.ViewModel;
-using Beneficios.Domain.Shareds.Notifications;
+﻿using Beneficios.Domain.Entities.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,26 +22,10 @@ public class BeneficioColaboradorController : ControllerBase
         _mediator = mediator;
     }
 
-    /// <summary>
-    /// Endpoint para incluir benefícios a um colaborador.
-    /// </summary>
-    /// <param name="command">O comando contendo os dados do colaborador e os benefícios a serem incluídos.</param>
-    /// <param name="cancellationToken">Token para cancelar a operação, se necessário.</param>
-    /// <returns>Uma resposta contendo o modelo de visualização do colaborador com os benefícios incluídos.</returns>
-    [HttpPost("incluir")]
-    [ProducesResponseType(typeof(Response<ColaboradorBeneficioViewModel>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(Response<ColaboradorBeneficioViewModel>), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> IncluirBeneficioColaborador(
-        [FromBody] IncluirBeneficioColaboradorCommand command,
-        CancellationToken cancellationToken)
+    [HttpPost]
+    public async Task<IActionResult> IncluirBeneficioColaborador([FromBody] IncluirBeneficioColaboradorCommand command, CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(command, cancellationToken);
-
-        if (response.IsSuccess)
-        {
-            return Ok(response);
-        }
-
-        return BadRequest(response);
+        var result = await _mediator.Send(command, cancellationToken);
+        return result.IsSuccess ? Ok(result) : BadRequest(result);
     }
 }

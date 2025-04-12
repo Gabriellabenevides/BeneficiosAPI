@@ -8,61 +8,84 @@ namespace Beneficios.MongoDB.Repositories;
 /// </summary>
 public class BeneficiosColaraboradorRepository : IBeneficioColaboradorRepository
 {
-    private readonly IRepository<Colaborador> _repository;
+    private readonly IRepository<BeneficioColaborador> _repository;
 
     /// <summary>
     /// Inicializa uma nova instância da classe <see cref="BeneficiosColaraboradorRepository"/>.
     /// </summary>
-    /// <param name="repository">O repositório genérico para operações com a entidade <see cref="Colaborador"/>.</param>
-    public BeneficiosColaraboradorRepository(IRepository<Colaborador> repository)
+    /// <param name="repository">O repositório genérico para operações com a entidade <see cref="BeneficioColaborador"/>.</param>
+    public BeneficiosColaraboradorRepository(IRepository<BeneficioColaborador> repository)
     {
         _repository = repository;
     }
 
     /// <inheritdoc />
-    public async Task<Colaborador> IncluirBeneficiosAoColaborador(Colaborador colaborador, CancellationToken cancellationToken)
+    public async Task<BeneficioColaborador> IncluirBeneficiosAoColaborador(BeneficioColaborador beneficioColaborador, CancellationToken cancellationToken)
     {
-        await _repository.InsertOnAsync(colaborador, cancellationToken);
-        return colaborador;
+        // Insere o objeto BeneficioColaborador no repositório
+        await _repository.InsertOnAsync(beneficioColaborador, cancellationToken);
+        return beneficioColaborador;
     }
 
     /// <inheritdoc />
-    public async Task<Colaborador?> ObterColaboradorComBeneficiosPorId(long idColaborador, CancellationToken cancellationToken)
+    public async Task<BeneficioColaborador?> ObterColaboradorComBeneficiosPorId(long idColaborador, CancellationToken cancellationToken)
     {
-        return await _repository.FindByIdAsync(idColaborador, cancellationToken);
+        // Busca o BeneficioColaborador pelo ID do colaborador
+        return await _repository.SingleOrDefaultAsync(
+            b => b.Colaborador.IdColaborador == idColaborador, cancellationToken);
     }
 
     /// <inheritdoc />
-    public async Task<Colaborador> AtualizarBeneficiosDoColaborador(long idColaborador, List<Beneficio> beneficios, CancellationToken cancellationToken)
+    public async Task<BeneficioColaborador> AtualizarBeneficiosDoColaborador(long idColaborador, List<Beneficio> beneficios, CancellationToken cancellationToken)
     {
-        var colaborador = await _repository.FindByIdAsync(idColaborador, cancellationToken);
-        if (colaborador == null)
+        // Busca o BeneficioColaborador pelo ID do colaborador
+        var beneficioColaborador = await _repository.SingleOrDefaultAsync(
+            b => b.Colaborador.IdColaborador == idColaborador, cancellationToken);
+
+        if (beneficioColaborador == null)
         {
             throw new KeyNotFoundException($"Colaborador com ID {idColaborador} não encontrado.");
         }
 
-        colaborador.Beneficios = beneficios;
-        await _repository.ReplaceOneAsync(colaborador, cancellationToken);
-        return colaborador;
+        // Cria uma nova instância com os benefícios atualizados
+        var atualizado = new BeneficioColaborador(
+            beneficioColaborador.Colaborador,
+            beneficios
+        );
+
+        await _repository.ReplaceOneAsync(atualizado, cancellationToken);
+
+        return atualizado;
     }
 
     /// <inheritdoc />
-    public async Task<Colaborador> RemoverBeneficioDoColaborador(long idColaborador, string nomeBeneficio, CancellationToken cancellationToken)
+    public async Task<BeneficioColaborador> RemoverBeneficioDoColaborador(long idColaborador, string nomeBeneficio, CancellationToken cancellationToken)
     {
-        var colaborador = await _repository.FindByIdAsync(idColaborador, cancellationToken);
-        if (colaborador == null)
+        // Busca o BeneficioColaborador pelo ID do colaborador
+        var beneficioColaborador = await _repository.SingleOrDefaultAsync(
+            b => b.Colaborador.IdColaborador == idColaborador, cancellationToken);
+
+        if (beneficioColaborador == null)
         {
             throw new KeyNotFoundException($"Colaborador com ID {idColaborador} não encontrado.");
         }
 
-        colaborador.Beneficios = colaborador.Beneficios?.Where(b => b.Nome != nomeBeneficio).ToList();
-        await _repository.ReplaceOneAsync(colaborador, cancellationToken);
-        return colaborador;
+        // Cria uma nova instância com os benefícios atualizados
+        var beneficiosAtualizados = beneficioColaborador.Beneficios?.Where(b => b.Nome != nomeBeneficio).ToList();
+        var atualizado = new BeneficioColaborador(
+            beneficioColaborador.Colaborador,
+            beneficiosAtualizados
+        );
+
+        await _repository.ReplaceOneAsync(atualizado, cancellationToken);
+
+        return atualizado;
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<Colaborador>> ObterTodosColaboradoresComBeneficios(CancellationToken cancellationToken)
+    public async Task<IEnumerable<BeneficioColaborador>> ObterTodosColaboradoresComBeneficios(CancellationToken cancellationToken)
     {
+        // Obtém todos os BeneficioColaborador
         return await _repository.GetAllAsync(cancellationToken);
     }
 }

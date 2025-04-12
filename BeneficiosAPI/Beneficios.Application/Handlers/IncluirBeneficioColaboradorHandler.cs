@@ -32,13 +32,13 @@ public class IncluirBeneficioColaboradorHandler : IRequestHandler<IncluirBenefic
     public async Task<Response<ColaboradorBeneficioViewModel>> Handle(IncluirBeneficioColaboradorCommand request, CancellationToken cancellationToken)
     {
         // Cria uma instância do colaborador com os dados fornecidos no comando
-        var colaborador = new Colaborador(request.Colaborador.IdColaborador, request.Colaborador.Nome, request.Colaborador.Cargo, request.Beneficios);
+        var beneficiosAoColaborador = new BeneficioColaborador(request.Colaborador, request.Beneficios);
 
         // Inclui os benefícios ao colaborador no repositório
-        var result = await _repository.IncluirBeneficiosAoColaborador(colaborador, cancellationToken);
+        var result = await _repository.IncluirBeneficiosAoColaborador(beneficiosAoColaborador, cancellationToken);
 
         // Cria o modelo de visualização do colaborador com os benefícios incluídos
-        var colaboradorBeneficioViewModel = new ColaboradorBeneficioViewModel(result, result.Beneficios);
+        var colaboradorBeneficioViewModel = new ColaboradorBeneficioViewModel(result.Colaborador, result.Beneficios);
 
         // Retorna a resposta com o modelo de visualização
         return new(colaboradorBeneficioViewModel);
