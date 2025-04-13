@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using Microsoft.OpenApi.Models;
 
 namespace Beneficios_API.Extensions.SwaggerConfigurations;
 

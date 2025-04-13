@@ -1,5 +1,4 @@
-﻿using Beneficios.MongoDB.Repositories;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Beneficios.Application;

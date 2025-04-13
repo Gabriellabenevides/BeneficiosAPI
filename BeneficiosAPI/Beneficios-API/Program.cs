@@ -1,9 +1,6 @@
 using Beneficios.Application;
 using Beneficios.Application.Handlers;
 using Beneficios_API.Extensions.SwaggerConfigurations;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace Beneficios_API;
 
